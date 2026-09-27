@@ -6,5 +6,6 @@ import react from "@vitejs/plugin-react";
 // and every asset 404s once deployed.
 export default defineConfig({
   plugins: [react()],
-  base: "/k8s-manifest-linter/",
+  // Vercel serves from the domain root and sets VERCEL=1 during its builds.
+  base: process.env.VERCEL ? "/" : "/k8s-manifest-linter/",
 });
