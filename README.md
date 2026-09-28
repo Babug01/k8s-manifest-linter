@@ -1,6 +1,6 @@
 # Kubernetes Manifest Linter
 
-**Live demo:** https://babug01.github.io/k8s-manifest-linter/
+**Live demo:** https://k8s-manifest-linter.vercel.app (Vercel) · [GitHub Pages mirror](https://babug01.github.io/k8s-manifest-linter/)
 
 Paste one or more `---`-separated YAML documents and get a severity-grouped list of common
 production-readiness and security issues, each with a one-line fix suggestion — the checks I
