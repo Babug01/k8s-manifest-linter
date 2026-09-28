@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../effects.js";
 
 export default function Header({ title, repoUrl }) {
   const [dark, setDark] = useState(() => {
@@ -11,6 +12,8 @@ export default function Header({ title, repoUrl }) {
     }
   });
   const [scrolled, setScrolled] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [showTop, setShowTop] = useState(false);
   const brandLabel = title ? `Dev Toolbox: ${title}` : "Dev Toolbox";
 
   useEffect(() => {
@@ -23,14 +26,26 @@ export default function Header({ title, repoUrl }) {
   }, [dark]);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 4);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(y > 4);
+      setShowTop(y > 400);
+      setProgress(max > 0 ? Math.min(1, y / max) : 0);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   return (
+    <>
     <header className={`app-header${scrolled ? " scrolled" : ""}`}>
+      <span className="scroll-progress" style={{ transform: `scaleX(${progress})` }} aria-hidden="true" />
       <a className="brand" href="./" aria-label={brandLabel}>
         <span className="brand-mark" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -82,5 +97,20 @@ export default function Header({ title, repoUrl }) {
         </button>
       </div>
     </header>
+
+    {/* Outside the header: its backdrop-filter would otherwise anchor this fixed button to the header. */}
+    <button
+      type="button"
+      className={`back-to-top${showTop ? " visible" : ""}`}
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      aria-label="Back to top"
+      title="Back to top"
+      tabIndex={showTop ? 0 : -1}
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 19V5M5 12l7-7 7 7" />
+      </svg>
+    </button>
+    </>
   );
 }

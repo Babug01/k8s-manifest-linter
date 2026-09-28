@@ -114,7 +114,27 @@ body::after {
   background: var(--header-bg);
   backdrop-filter: blur(14px) saturate(160%);
   -webkit-backdrop-filter: blur(14px) saturate(160%);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, height 0.3s var(--ease);
+  animation: header-in 0.6s var(--ease) both;
+}
+
+@keyframes header-in {
+  from { opacity: 0; transform: translateY(-100%); }
+  to { opacity: 1; transform: none; }
+}
+
+.scroll-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 100%;
+  height: 3px;
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent), var(--accent-2));
+  box-shadow: 0 0 12px var(--glow);
+  transition: transform 0.15s linear;
+  pointer-events: none;
 }
 
 .app-header::after {
@@ -131,7 +151,12 @@ body::after {
 }
 
 .app-header.scrolled {
+  height: 50px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.app-header.scrolled .brand-mark {
+  transform: scale(0.9);
 }
 
 .brand {
@@ -461,6 +486,144 @@ a {
   border: 3px solid transparent;
   border-radius: 999px;
   background-clip: padding-box;
+}
+
+/* ---------- Extra effects (driven by src/effects.js) ---------- */
+/* Panels fade up whenever a tool renders them, so results appear with motion too. */
+div[style*="border: 1px solid var(--border"][style*="border-radius"] {
+  animation: rise 0.5s var(--ease) both;
+}
+
+/* Cursor spotlight: effects.js sets --mx/--my; layered over each panel's own background colour. */
+div[style*="border: 1px solid var(--border"][style*="border-radius"]:hover {
+  background-image: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(91, 76, 240, 0.09), transparent 45%) !important;
+}
+
+/* Only typing targets light the panel up; a clicked button keeps focus and shouldn't. */
+div[style*="border: 1px solid var(--border"][style*="border-radius"]:has(input:focus, textarea:focus, select:focus, .cm-editor.cm-focused) {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent), 0 12px 36px var(--glow);
+}
+
+.fx-ripple-host {
+  position: relative;
+  overflow: hidden;
+}
+
+.fx-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.25;
+  transform: scale(0);
+  pointer-events: none;
+  animation: ripple 0.6s ease-out forwards;
+}
+
+@keyframes ripple {
+  to { transform: scale(1); opacity: 0; }
+}
+
+#fx-toasts {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.fx-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 12px 30px var(--glow);
+  animation: toast-in 0.35s var(--ease) both;
+}
+
+.fx-toast::before {
+  content: "\2713";
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-size: 11px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.fx-toast.leaving {
+  animation: toast-out 0.35s var(--ease) both;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.9); }
+}
+
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(8px) scale(0.95); }
+}
+
+.back-to-top {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: #fff;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 10px 28px var(--glow);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px) scale(0.8);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.35s var(--ease);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.back-to-top.visible:hover {
+  transform: translateY(-3px);
+}
+
+.back-to-top svg {
+  width: 20px;
+  height: 20px;
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  animation: pop 0.3s var(--ease);
+}
+
+@keyframes pop {
+  50% { transform: scale(1.25); }
+}
+
+textarea,
+input,
+.cm-content {
+  caret-color: var(--accent);
 }
 
 @media (prefers-reduced-motion: reduce) {
